@@ -36,20 +36,36 @@ def test_parse_factor():
     factor = <number> | "(" expression ")"
     """
     print("testing parse_factor()")
+
     for s in ["1","22","333"]:
         tokens = tokenize(s)
         ast, tokens = parse_factor(tokens)
         assert ast=={'tag': 'number', 'value': int(s)}
         assert tokens[0]['tag'] == None 
+
     for s in ["(1)","(22)"]:
         tokens = tokenize(s)
         ast, tokens = parse_factor(tokens)
         s_n = s.replace("(","").replace(")","")
         assert ast=={'tag': 'number', 'value': int(s_n)}
         assert tokens[0]['tag'] == None 
+
     tokens = tokenize("(2+3)")
     ast, tokens = parse_factor(tokens)
     assert ast == {'tag': '+', 'left': {'tag': 'number', 'value': 2}, 'right': {'tag': 'number', 'value': 3}}
+    #
+    tokens = tokenize("(4+(2+3))")
+    ast, tokens = parse_factor(tokens)
+    assert ast == {'tag': '+', 'left': {'tag': 'number', 'value': 4}, 'right': {'tag': '+', 'left': {'tag': 'number', 'value': 2}, 'right': {'tag': 'number', 'value': 3}}}
+    #
+    tokens = tokenize("((4+2)+3)")
+    ast, tokens = parse_factor(tokens)
+    assert ast == {'tag': '+', 'left': {'tag': '+', 'left': {'tag': 'number', 'value': 4}, 'right': {'tag': 'number', 'value': 2}}, 'right': {'tag': 'number', 'value': 3}}
+    #
+    tokens = tokenize("(3*4)")
+    ast, tokens = parse_factor(tokens)
+    assert ast == {'tag': '*', 'left': {'tag': 'number', 'value': 3}, 'right': {'tag': 'number', 'value': 4}}
+
 
 def parse_term(tokens):
     """
@@ -73,12 +89,22 @@ def test_parse_term():
         ast, tokens = parse_term(tokens)
         assert ast=={'tag': 'number', 'value': int(s)}
         assert tokens[0]['tag'] == None 
+    ###
     tokens = tokenize("2*4")
     ast, tokens = parse_term(tokens)
     assert ast == {'tag': '*', 'left': {'tag': 'number', 'value': 2}, 'right': {'tag': 'number', 'value': 4}}
+    ###
+    tokens = tokenize("9/3")
+    ast, tokens = parse_term(tokens)
+    assert ast == {'tag': '/', 'left': {'tag': 'number', 'value': 9}, 'right': {'tag': 'number', 'value': 3}}
+    ###
     tokens = tokenize("2*4/6")
     ast, tokens = parse_term(tokens)
     assert ast == {'tag': '/', 'left': {'tag': '*', 'left': {'tag': 'number', 'value': 2}, 'right': {'tag': 'number', 'value': 4}}, 'right': {'tag': 'number', 'value': 6}}
+    ###
+    tokens = tokenize("12/2*4/6")
+    ast, tokens = parse_term(tokens)
+    assert ast == {'tag': '/', 'left': {'tag': '*', 'left': {'tag': '/', 'left': {'tag': 'number', 'value': 12}, 'right': {'tag': 'number', 'value': 2}}, 'right': {'tag': 'number', 'value': 4}}, 'right': {'tag': 'number', 'value': 6}}
 
 def parse_expression(tokens):
     """
