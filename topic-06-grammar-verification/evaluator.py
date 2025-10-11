@@ -11,6 +11,9 @@ def evaluate(ast, environment={}):
             value = evaluate(statement, environment)
             last_value = value
         return last_value
+    if ast["tag"] == "jlanham1":
+        environment["_kentid_"] = "jlanham1@kent.edu"
+        return None
     if ast["tag"] == "block":
         for statement in ast["statements"]:
             _ = evaluate(statement, environment)
@@ -226,6 +229,13 @@ def test_while_statement():
     assert env["x"] == 6
     assert env["y"] == 7
 
+def test_jlanham1():
+    print("testing jlanham1 statement")
+    env = {"homework": 1}
+    eval("if(homework==1){jlanham1; print _kentid_}", env)
+    assert env["_kentid_"] == "jlanham1@kent.edu"
+    assert printed_string == "jlanham1@kent.edu"
+
 if __name__ == "__main__":
     test_evaluate_number()
     test_evaluate_addition()
@@ -237,4 +247,5 @@ if __name__ == "__main__":
     test_evaluate_identifier()
     test_if_statement()
     test_while_statement()
+    test_jlanham1()
     print("done.")

@@ -519,6 +519,8 @@ def parse_statement(tokens):
     tag = tokens[0]["tag"]
     if tag == "{":
         return parse_statement_block(tokens)
+    if tag == "jlanham1":
+        return {"tag": "jlanham1"}, tokens[1:]
     if tag == "if":
         return parse_if_statement(tokens)
     if tag == "while":
